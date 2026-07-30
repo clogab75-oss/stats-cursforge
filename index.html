@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Statistiques de mon Profil CurseForge</title>
+  <title>Mes Stats CurseForge</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -42,15 +42,17 @@
     .project-card {
       background: #1e1e1e;
       border-radius: 8px;
-      padding: 15px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      text-align: center;
     }
     .project-card img {
       width: 64px;
       height: 64px;
       border-radius: 8px;
+      margin-bottom: 10px;
     }
   </style>
 </head>
@@ -75,59 +77,49 @@
   </div>
 
   <script>
-    // ⚠️ Remplace par ta nouvelle clé si tu la régénères
-    const API_KEY = "fc5063b4-7755-43e8-93e1-f27755008dec"; 
-    
-    // IDs de tes projets CurseForge à afficher (ex: [123456, 789012])
-    const MY_PROJECT_IDS = [ 1585878, 1585342, 1588126/* Colle tes IDs de projets ici */ ];
+    // 💡 Mets ici les "slugs" de tes projets CurseForge
+    // Exemple : si l'URL de ton projet est curseforge.com/minecraft/mc-mods/mon-super-mod
+    // Le slug est "mc-mods/mon-super-mod" ou juste "mon-super-mod"
+    const MY_PROJECT_SLUGS = [
+      "data-packs/custom-advancements",
+      "mc-mods/esp-x-ray"
+      "mc-mods/verticals-slabs"
+    ];
 
-    async function fetchProfileStats() {
-      if (MY_PROJECT_IDS.length === 0) {
-        document.getElementById('projects-list').innerHTML = "Veuillez ajouter les IDs de vos projets dans le script.";
-        return;
-      }
+    async function fetchStats() {
+      const container = document.getElementById('projects-list');
+      container.innerHTML = '';
 
-      try {
-        const response = await fetch('https://api.curseforge.com/v1/mods', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'x-api-key': API_KEY
-          },
-          body: JSON.stringify({ modIds: MY_PROJECT_IDS })
-        });
+      let totalDownloads = 0;
+      let loadedProjects = 0;
 
-        const result = await response.json();
-        const mods = result.data;
+      for (const slug of MY_PROJECT_SLUGS) {
+        try {
+          const response = await fetch(`https://api.cfwidget.com/${slug}`);
+          if (!response.ok) continue;
 
-        let totalDownloads = 0;
-        const projectsContainer = document.getElementById('projects-list');
-        projectsContainer.innerHTML = '';
-
-        mods.forEach(mod => {
-          totalDownloads += mod.downloadCount;
+          const data = await response.json();
+          totalDownloads += data.downloads.total;
+          loadedProjects++;
 
           const card = document.createElement('div');
           card.className = 'project-card';
           card.innerHTML = `
-            <img src="${mod.logo ? mod.logo.thumbnailUrl : ''}" alt="${mod.name}">
-            <h3>${mod.name}</h3>
-            <p><strong>${mod.downloadCount.toLocaleString()}</strong> téléchargements</p>
+            <img src="${data.thumbnail}" alt="${data.title}">
+            <h3>${data.title}</h3>
+            <p><strong>${data.downloads.total.toLocaleString()}</strong> téléchargements</p>
           `;
-          projectsContainer.appendChild(card);
-        });
-
-        document.getElementById('total-projects').innerText = mods.length;
-        document.getElementById('total-downloads').innerText = totalDownloads.toLocaleString();
-
-      } catch (error) {
-        console.error("Erreur d'accès à l'API :", error);
-        document.getElementById('projects-list').innerHTML = "Erreur de chargement (Blocage CORS ou Clé API invalide).";
+          container.appendChild(card);
+        } catch (err) {
+          console.error("Erreur avec le projet", slug, err);
+        }
       }
+
+      document.getElementById('total-projects').innerText = loadedProjects;
+      document.getElementById('total-downloads').innerText = totalDownloads.toLocaleString();
     }
 
-    fetchProfileStats();
+    fetchStats();
   </script>
 </body>
 </html>
