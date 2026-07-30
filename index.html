@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mes Stats CurseForge</title>
+  <title>Mes Stats CurseForge Détaillées</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -14,76 +14,120 @@
       flex-direction: column;
       align-items: center;
     }
-    h1 { color: #f97316; }
+    h1 { color: #f97316; margin-bottom: 5px; }
+    p.subtitle { color: #a1a1aa; margin-top: 0; margin-bottom: 25px; }
+    
     .stats-container {
       display: flex;
-      gap: 20px;
-      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 35px;
     }
     .stat-card {
       background: #1e1e1e;
-      padding: 20px;
+      padding: 15px 25px;
       border-radius: 10px;
       text-align: center;
-      min-width: 150px;
+      min-width: 140px;
+      border: 1px solid #2d2d2d;
     }
     .stat-value {
-      font-size: 2rem;
+      font-size: 1.8rem;
       font-weight: bold;
       color: #f97316;
     }
+    
     .projects-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 20px;
       width: 100%;
-      max-width: 900px;
+      max-width: 1000px;
     }
     .project-card {
       background: #1e1e1e;
-      border-radius: 8px;
+      border-radius: 12px;
       padding: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      text-align: center;
+      border: 1px solid #2d2d2d;
+      transition: transform 0.2s;
+    }
+    .project-card:hover {
+      transform: translateY(-4px);
     }
     .project-card img {
       width: 64px;
       height: 64px;
-      border-radius: 8px;
-      margin-bottom: 10px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    .project-card h3 {
+      margin: 5px 0 10px 0;
+      text-align: center;
+      font-size: 1.2rem;
+    }
+    .badge {
+      background: #2a2a2a;
+      color: #f97316;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin-bottom: 15px;
+    }
+    .details {
+      width: 100%;
+      font-size: 0.9rem;
+      color: #d4d4d8;
+      border-top: 1px solid #2d2d2d;
+      padding-top: 10px;
+      margin-top: auto;
+    }
+    .details-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 6px 0;
+    }
+    .highlight {
+      color: #22c55e;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
   <h1>Mes Stats CurseForge</h1>
+  <p class="subtitle">Tableau de bord en temps réel</p>
 
   <div class="stats-container">
     <div class="stat-card">
-      <div>Total Projets</div>
+      <div>Projets</div>
       <div id="total-projects" class="stat-value">0</div>
     </div>
     <div class="stat-card">
-      <div>Total Téléchargements</div>
+      <div>Téléchargements</div>
       <div id="total-downloads" class="stat-value">0</div>
+    </div>
+    <div class="stat-card">
+      <div>Pièces Estimées 🪙</div>
+      <div id="total-points" class="stat-value">0</div>
     </div>
   </div>
 
-  <h2>Mes Projets</h2>
+  <h2>Détail de mes Projets</h2>
   <div id="projects-list" class="projects-grid">
-    Chargement de vos projets...
+    Chargement des projets...
   </div>
 
   <script>
-    // ⚠️ Remplace les éléments ci-dessous par les slugs exacts de tes projets CurseForge
-    // Exemple d'URL CurseForge : curseforge.com/minecraft/worlds/mon-monde
-    // Le slug est : "worlds/mon-monde"
+    // 💡 Mets ici les slugs exacts de tes projets depuis CurseForge
+    // Exemple : "minecraft/mc-mods/esp-x-ray"
     const MY_PROJECT_SLUGS = [
-      "minecraft/data-packs/custom-advancements",
       "minecraft/mc-mods/esp-x-ray",
-      "minecraft/mc-mods/verticals-slabs"
+      "minecraft/mc-mods/verticals-slabs",
+      "minecraft/customization/custom-advancements" 
     ];
 
     async function fetchStats() {
@@ -91,6 +135,7 @@
       container.innerHTML = '';
 
       let totalDownloads = 0;
+      let totalPoints = 0;
       let loadedProjects = 0;
 
       for (const slug of MY_PROJECT_SLUGS) {
@@ -99,7 +144,13 @@
           if (!response.ok) continue;
 
           const data = await response.json();
-          totalDownloads += data.downloads.total;
+          
+          const downloads = data.downloads.total || 0;
+          // Estimation basée sur les barèmes moyens du Reward Program de CurseForge
+          const estimatedPoints = Math.round(downloads * 0.05); 
+          
+          totalDownloads += downloads;
+          totalPoints += estimatedPoints;
           loadedProjects++;
 
           const card = document.createElement('div');
@@ -107,16 +158,36 @@
           card.innerHTML = `
             <img src="${data.thumbnail}" alt="${data.title}">
             <h3>${data.title}</h3>
-            <p><strong>${data.downloads.total.toLocaleString()}</strong> téléchargements</p>
+            <span class="badge">${data.game || 'Minecraft'}</span>
+            
+            <div class="details">
+              <div class="details-row">
+                <span>📥 Téléchargements :</span>
+                <strong>${downloads.toLocaleString()}</strong>
+              </div>
+              <div class="details-row">
+                <span>🪙 Pièces estimées :</span>
+                <span class="highlight">+${estimatedPoints.toLocaleString()} pts</span>
+              </div>
+              <div class="details-row">
+                <span>❤️ Suivis / Likes :</span>
+                <strong>${(data.followers || 0).toLocaleString()}</strong>
+              </div>
+              <div class="details-row">
+                <span>📅 Mis à jour :</span>
+                <strong>${data.last_update || 'Inconnu'}</strong>
+              </div>
+            </div>
           `;
           container.appendChild(card);
         } catch (err) {
-          console.error("Erreur avec le projet", slug, err);
+          console.error("Erreur de chargement pour", slug, err);
         }
       }
 
       document.getElementById('total-projects').innerText = loadedProjects;
       document.getElementById('total-downloads').innerText = totalDownloads.toLocaleString();
+      document.getElementById('total-points').innerText = totalPoints.toLocaleString();
     }
 
     fetchStats();
