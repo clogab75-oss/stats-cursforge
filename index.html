@@ -13,6 +13,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      margin: 0;
     }
     h1 { color: #f97316; margin-bottom: 5px; }
     p.subtitle { color: #a1a1aa; margin-top: 0; margin-bottom: 25px; }
@@ -38,7 +39,7 @@
       color: #f97316;
     }
     .money-value {
-      color: #22c55e; /* Vert pour l'argent */
+      color: #22c55e;
     }
     
     .projects-grid {
@@ -100,3 +101,110 @@
   </style>
 </head>
 <body>
+
+  <h1>Mes Stats CurseForge</h1>
+  <p class="subtitle">Tableau de bord en temps réel</p>
+
+  <div class="stats-container">
+    <div class="stat-card">
+      <div>Projets</div>
+      <div id="total-projects" class="stat-value">0</div>
+    </div>
+    <div class="stat-card">
+      <div>Téléchargements</div>
+      <div id="total-downloads" class="stat-value">0</div>
+    </div>
+    <div class="stat-card">
+      <div>Pièces Estimées 🪙</div>
+      <div id="total-points" class="stat-value">0</div>
+    </div>
+    <div class="stat-card">
+      <div>Gains Estimés 💶</div>
+      <div id="total-money" class="stat-value money-value">0,00 €</div>
+    </div>
+  </div>
+
+  <h2>Détail de mes Projets</h2>
+  <div id="projects-list" class="projects-grid">
+    Chargement des projets...
+  </div>
+
+  <script>
+    // 💡 Mets tes slugs exacts ici
+    const MY_PROJECT_SLUGS = [
+      "minecraft/mc-mods/esp-x-ray",
+      "minecraft/mc-mods/verticals-slabs",
+      "minecraft/customization/custom-advancements"
+    ];
+
+    async function fetchStats() {
+      const container = document.getElementById('projects-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      let totalDownloads = 0;
+      let totalPoints = 0;
+      let loadedProjects = 0;
+
+      for (const slug of MY_PROJECT_SLUGS) {
+        try {
+          const response = await fetch(`https://api.cfwidget.com/${slug}`);
+          if (!response.ok) continue;
+
+          const data = await response.json();
+          
+          const downloads = data.downloads ? (data.downloads.total || 0) : 0;
+          
+          // Ton ratio ajusté à 0.011 (pièces par téléchargement)
+          const estimatedPoints = Math.round(downloads * 0.011); 
+          // 1 point CurseForge = ~0.0436 € (11 points = 0.48 €)
+          const estimatedMoney = estimatedPoints * 0.0436;
+
+          totalDownloads += downloads;
+          totalPoints += estimatedPoints;
+          loadedProjects++;
+
+          const card = document.createElement('div');
+          card.className = 'project-card';
+          card.innerHTML = `
+            <img src="${data.thumbnail || ''}" alt="${data.title || 'Projet'}">
+            <h3>${data.title || 'Sans titre'}</h3>
+            <span class="badge">${data.game || 'Minecraft'}</span>
+            
+            <div class="details">
+              <div class="details-row">
+                <span>📥 Téléchargements :</span>
+                <strong>${downloads.toLocaleString()}</strong>
+              </div>
+              <div class="details-row">
+                <span>🪙 Pièces estimées :</span>
+                <span>${estimatedPoints.toLocaleString()} pts</span>
+              </div>
+              <div class="details-row">
+                <span>💵 Gains estimés :</span>
+                <span class="highlight">${estimatedMoney.toFixed(2)} €</span>
+              </div>
+              <div class="details-row">
+                <span>❤️ Suivis / Likes :</span>
+                <strong>${(data.followers || 0).toLocaleString()}</strong>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        } catch (err) {
+          console.error("Erreur de chargement pour", slug, err);
+        }
+      }
+
+      const totalMoney = totalPoints * 0.0436;
+
+      document.getElementById('total-projects').innerText = loadedProjects;
+      document.getElementById('total-downloads').innerText = totalDownloads.toLocaleString();
+      document.getElementById('total-points').innerText = totalPoints.toLocaleString();
+      document.getElementById('total-money').innerText = totalMoney.toFixed(2).replace('.', ',') + " €";
+    }
+
+    fetchStats();
+  </script>
+</body>
+</html>
