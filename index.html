@@ -1,213 +1,433 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mes Stats CurseForge Détaillées</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #121212;
-      color: #ffffff;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 0;
-    }
-    h1 { color: #f97316; margin-bottom: 5px; }
-    p.subtitle { color: #a1a1aa; margin-top: 0; margin-bottom: 25px; }
-    
-    .stats-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      justify-content: center;
-      margin-bottom: 35px;
-    }
-    .stat-card {
-      background: #1e1e1e;
-      padding: 15px 25px;
-      border-radius: 10px;
-      text-align: center;
-      min-width: 140px;
-      border: 1px solid #2d2d2d;
-    }
-    .stat-value {
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: #f97316;
-    }
-    .money-value {
-      color: #22c55e;
-    }
-    
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
-      width: 100%;
-      max-width: 1000px;
-    }
-    .project-card {
-      background: #1e1e1e;
-      border-radius: 12px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      border: 1px solid #2d2d2d;
-      transition: transform 0.2s;
-    }
-    .project-card:hover {
-      transform: translateY(-4px);
-    }
-    .project-card img {
-      width: 64px;
-      height: 64px;
-      border-radius: 10px;
-      margin-bottom: 12px;
-    }
-    .project-card h3 {
-      margin: 5px 0 10px 0;
-      text-align: center;
-      font-size: 1.2rem;
-    }
-    .badge {
-      background: #2a2a2a;
-      color: #f97316;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      margin-bottom: 15px;
-    }
-    .details {
-      width: 100%;
-      font-size: 0.9rem;
-      color: #d4d4d8;
-      border-top: 1px solid #2d2d2d;
-      padding-top: 10px;
-      margin-top: auto;
-    }
-    .details-row {
-      display: flex;
-      justify-content: space-between;
-      margin: 6px 0;
-    }
-    .highlight {
-      color: #22c55e;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes Stats CurseForge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Manrope:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0d12;
+    --surface:#151920;
+    --surface-2:#1c212b;
+    --border:#262c38;
+    --border-hover:#3a4152;
+    --text:#eef0f5;
+    --text-dim:#8991a3;
+    --text-faint:#5b6474;
+    --copper:#e2984a;
+    --copper-dim:rgba(226,152,74,.15);
+    --emerald:#3ddc97;
+    --emerald-dim:rgba(61,220,151,.15);
+    --amethyst:#a58af0;
+    --amethyst-dim:rgba(165,138,240,.15);
+    --danger:#f2596e;
+    --danger-dim:rgba(242,89,110,.12);
+    --radius-lg:18px;
+    --radius-md:12px;
+    --font-display:'Space Grotesk',sans-serif;
+    --font-body:'Manrope',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:radial-gradient(ellipse at top,#141822 0%,var(--bg) 55%);
+    color:var(--text);
+    font-family:var(--font-body);
+    min-height:100vh;
+  }
+  .page{max-width:1100px;margin:0 auto;padding:48px 24px 72px;}
+
+  /* ---------- Header ---------- */
+  .hero{
+    position:relative;
+    display:flex;justify-content:space-between;align-items:flex-end;
+    gap:24px;flex-wrap:wrap;
+    margin-bottom:40px;padding-bottom:28px;
+    border-bottom:1px solid var(--border);
+  }
+  .hero::before{
+    content:"";position:absolute;inset:-24px -24px auto -24px;height:140px;z-index:-1;
+    background:repeating-linear-gradient(115deg,transparent 0 18px,rgba(226,152,74,.06) 18px 19px,transparent 19px 54px,rgba(165,138,240,.05) 54px 55px);
+    pointer-events:none;
+  }
+  .eyebrow{font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.14em;font-size:.72rem;color:var(--copper);margin:0 0 10px;}
+  h1{font-family:var(--font-display);font-size:2.5rem;margin:0;line-height:1.05;font-weight:700;}
+  h1 .accent{color:var(--copper);}
+  .subtitle{color:var(--text-dim);margin:10px 0 0;font-size:1rem;max-width:44ch;}
+
+  .refresh-panel{display:flex;align-items:center;gap:16px;}
+  .refresh-btn{
+    position:relative;width:52px;height:52px;border-radius:50%;
+    border:none;background:var(--surface);cursor:pointer;
+    display:grid;place-items:center;color:var(--copper);
+  }
+  .refresh-btn:hover{background:var(--surface-2);}
+  .refresh-btn svg.ring{position:absolute;inset:0;}
+  .refresh-icon{position:relative;display:grid;place-items:center;line-height:0;}
+  .refresh-btn.spinning .refresh-icon{animation:spin .9s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .refresh-meta{display:flex;flex-direction:column;gap:6px;font-size:.82rem;color:var(--text-dim);}
+  .refresh-meta .row{display:flex;align-items:center;gap:8px;}
+  select#interval-select{
+    background:var(--surface);border:1px solid var(--border);color:var(--text);
+    border-radius:8px;padding:4px 8px;font-family:var(--font-body);font-size:.8rem;
+  }
+  #last-updated{font-family:var(--font-mono);color:var(--text-faint);font-size:.75rem;}
+
+  /* ---------- Stats ---------- */
+  .stats-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:48px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px 20px;}
+  .stat-label{font-size:.78rem;color:var(--text-dim);}
+  .stat-value{font-family:var(--font-mono);font-weight:700;font-size:1.55rem;margin-top:6px;}
+  .stat-value.copper{color:var(--copper);}
+  .stat-value.emerald{color:var(--emerald);}
+  .stat-value.amethyst{color:var(--amethyst);}
+
+  /* ---------- Section header ---------- */
+  .section-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px;gap:12px;flex-wrap:wrap;}
+  h2{font-family:var(--font-display);font-size:1.3rem;margin:0;}
+  #projects-count-badge{
+    font-family:var(--font-mono);font-size:.78rem;color:var(--text-dim);
+    background:var(--surface);padding:4px 10px;border-radius:20px;border:1px solid var(--border);
+  }
+
+  /* ---------- Project cards ---------- */
+  .projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px;}
+  .project-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+    padding:20px;display:flex;flex-direction:column;
+    transition:border-color .2s,transform .2s;
+  }
+  .project-card:hover{border-color:var(--border-hover);transform:translateY(-3px);}
+  .card-top{display:flex;gap:14px;align-items:center;margin-bottom:16px;}
+  .card-top img{width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0;background:var(--surface-2);}
+  .card-top h3{margin:0 0 6px;font-family:var(--font-display);font-size:1.05rem;line-height:1.2;}
+  .badges{display:flex;gap:6px;flex-wrap:wrap;}
+  .badge{font-size:.7rem;padding:3px 9px;border-radius:20px;background:var(--copper-dim);color:var(--copper);font-family:var(--font-mono);}
+  .badge-alt{background:var(--amethyst-dim);color:var(--amethyst);}
+
+  .details{border-top:1px solid var(--border);padding-top:12px;margin-top:auto;display:flex;flex-direction:column;gap:8px;}
+  .details-row{display:flex;justify-content:space-between;font-size:.86rem;color:var(--text-dim);gap:12px;}
+  .details-row strong{color:var(--text);font-family:var(--font-mono);}
+  .highlight{color:var(--emerald);font-weight:700;font-family:var(--font-mono);}
+
+  .share-bar{margin-top:14px;height:5px;border-radius:3px;background:var(--surface-2);overflow:hidden;}
+  .share-fill{height:100%;background:linear-gradient(90deg,var(--copper),var(--emerald));border-radius:3px;transition:width .6s ease;}
+
+  /* ---------- Error / skeleton states ---------- */
+  .project-card.error-card{border-color:rgba(242,89,110,.35);background:linear-gradient(180deg,var(--danger-dim),var(--surface) 60%);}
+  .error-icon{font-size:1.3rem;margin-bottom:8px;}
+  .error-card h3{font-family:var(--font-mono);font-size:.85rem;font-weight:500;color:var(--text-dim);word-break:break-all;}
+  .error-msg{color:var(--text-dim);font-size:.85rem;margin:4px 0 0;}
+
+  .project-card.skeleton{gap:12px;}
+  .thumb-skel{width:56px;height:56px;border-radius:10px;}
+  .line-skel{height:12px;border-radius:6px;}
+  .thumb-skel,.line-skel{
+    background:linear-gradient(90deg,var(--surface-2) 25%,#262c38 37%,var(--surface-2) 63%);
+    background-size:400% 100%;animation:shimmer 1.4s ease infinite;
+  }
+  .w70{width:70%;}.w40{width:40%;}
+  @keyframes shimmer{0%{background-position:100% 50%;}100%{background-position:0 50%;}}
+
+  footer{margin-top:56px;padding-top:24px;border-top:1px solid var(--border);font-size:.8rem;color:var(--text-faint);line-height:1.65;}
+  footer strong{color:var(--text-dim);}
+
+  @media(max-width:640px){
+    .hero{flex-direction:column;align-items:flex-start;}
+    h1{font-size:2rem;}
+    .refresh-panel{width:100%;justify-content:space-between;}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation-duration:.001ms !important;transition:none !important;}
+    .project-card:hover{transform:none;}
+  }
+  button:focus-visible,select:focus-visible{outline:2px solid var(--copper);outline-offset:2px;}
+</style>
 </head>
 <body>
+  <div class="page">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Tableau de bord en direct</p>
+        <h1>Mes Stats <span class="accent">CurseForge</span></h1>
+        <p class="subtitle">Suivi automatique de mes mods, plugins et cartes Minecraft.</p>
+      </div>
+      <div class="refresh-panel">
+        <button id="refresh-btn" class="refresh-btn" aria-label="Rafraîchir maintenant" title="Rafraîchir maintenant">
+          <svg class="ring" width="52" height="52" viewBox="0 0 52 52">
+            <circle cx="26" cy="26" r="21" fill="none" style="stroke:var(--border)" stroke-width="3"/>
+            <circle id="ring-progress" cx="26" cy="26" r="21" fill="none" style="stroke:var(--copper)" stroke-width="3" stroke-linecap="round" transform="rotate(-90 26 26)"/>
+          </svg>
+          <span class="refresh-icon" id="refresh-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/>
+            </svg>
+          </span>
+        </button>
+        <div class="refresh-meta">
+          <div class="row">
+            <label for="interval-select">Actualisation auto</label>
+            <select id="interval-select">
+              <option value="60000">1 min</option>
+              <option value="300000" selected>5 min</option>
+              <option value="900000">15 min</option>
+              <option value="1800000">30 min</option>
+            </select>
+          </div>
+          <span id="last-updated" aria-live="polite">Chargement…</span>
+        </div>
+      </div>
+    </header>
 
-  <h1>Mes Stats CurseForge</h1>
-  <p class="subtitle">Tableau de bord en temps réel</p>
+    <section class="stats-container" aria-live="polite">
+      <div class="stat-card">
+        <div class="stat-label">Projets chargés</div>
+        <div id="stat-projects" class="stat-value">–</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Téléchargements totaux</div>
+        <div id="stat-downloads" class="stat-value">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Ce mois-ci</div>
+        <div id="stat-monthly" class="stat-value amethyst">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pièces estimées 🪙</div>
+        <div id="stat-points" class="stat-value copper">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Gains estimés 💶</div>
+        <div id="stat-money" class="stat-value emerald">0,00 €</div>
+      </div>
+    </section>
 
-  <div class="stats-container">
-    <div class="stat-card">
-      <div>Projets</div>
-      <div id="total-projects" class="stat-value">0</div>
+    <div class="section-header">
+      <h2>Détail de mes projets</h2>
+      <span id="projects-count-badge">—</span>
     </div>
-    <div class="stat-card">
-      <div>Téléchargements</div>
-      <div id="total-downloads" class="stat-value">0</div>
-    </div>
-    <div class="stat-card">
-      <div>Pièces Estimées 🪙</div>
-      <div id="total-points" class="stat-value">0</div>
-    </div>
-    <div class="stat-card">
-      <div>Gains Estimés 💶</div>
-      <div id="total-money" class="stat-value money-value">0,00 €</div>
-    </div>
+    <div id="projects-list" class="projects-grid"></div>
+
+    <footer>
+      <strong>Notes :</strong> les pièces et gains sont une estimation (ratio configurable dans le code : points par téléchargement et € par point), pas une donnée officielle CurseForge.
+      L'API CFWidget met ses données en cache jusqu'à 1h côté serveur : rafraîchir plus souvent que ça ne fera pas apparaître de nouveaux chiffres tant que le cache n'a pas expiré.
+      Le slug <code>minecraft/bukkit-plugins/opti-server/preview</code> contient un segment <code>/preview</code> qui ne suit pas le format standard <code>jeu/type/slug</code> utilisé par CFWidget — si ce projet reste en erreur ci-dessus, vérifie son chemin exact sur CurseForge.
+    </footer>
   </div>
 
-  <h2>Détail de mes Projets</h2>
-  <div id="projects-list" class="projects-grid">
-    Chargement des projets...
-  </div>
-
-  <script>
-    // 💡 Mets tes slugs exacts ici
-    const MY_PROJECT_SLUGS = [
+<script>
+  const CONFIG = {
+    slugs: [
       "minecraft/mc-mods/esp-x-ray",
       "minecraft/mc-mods/verticals-slabs",
       "minecraft/data-packs/custom-advancements",
       "minecraft/worlds/original-skyblock",
       "minecraft/bukkit-plugins/anti-x-ray-administation",
       "minecraft/bukkit-plugins/opti-server/preview"
-    ];
+    ],
+    pointsPerDownload: 0.011,   // pièces estimées par téléchargement
+    eurosPerPoint: 0.0436,      // € estimés par pièce
+    maxRetries: 4,              // tentatives si CFWidget répond 202 (projet en cours d'indexation)
+    retryDelayMs: 2500
+  };
 
-    async function fetchStats() {
-      const container = document.getElementById('projects-list');
-      if (!container) return;
-      container.innerHTML = '';
+  const FALLBACK_ICON = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' +
+    '<rect width="64" height="64" rx="14" fill="#1c212b"/>' +
+    '<path d="M32 14 L50 24 V42 L32 52 L14 42 V24 Z" fill="none" stroke="#e2984a" stroke-width="3"/>' +
+    '<path d="M32 14 V52 M14 24 L50 42 M50 24 L14 42" stroke="#3a4152" stroke-width="2"/></svg>'
+  );
 
-      let totalDownloads = 0;
-      let totalPoints = 0;
-      let loadedProjects = 0;
+  const ERROR_MESSAGES = {
+    queue: "En cours d'indexation par CFWidget, réessaie dans une minute.",
+    notfound: "Projet introuvable sur CurseForge — vérifie le slug.",
+    invalid: "Chemin invalide — vérifie l'URL du projet.",
+    network: "Impossible de contacter l'API (réseau ou CORS bloqué).",
+    unknown: "Erreur inattendue de l'API CFWidget."
+  };
 
-      for (const slug of MY_PROJECT_SLUGS) {
-        try {
-          const response = await fetch(`https://api.cfwidget.com/${slug}`);
-          if (!response.ok) continue;
+  let isFetching = false;
+  let refreshTimer = null;
+  let countdownTimer = null;
+  let msRemaining = getIntervalMs();
+  const RING_CIRCUMFERENCE = 2 * Math.PI * 21;
 
-          const data = await response.json();
-          
-          const downloads = data.downloads ? (data.downloads.total || 0) : 0;
-          
-          // Ton ratio ajusté à 0.011 (pièces par téléchargement)
-          const estimatedPoints = Math.round(downloads * 0.011); 
-          // 1 point CurseForge = ~0.0436 € (11 points = 0.48 €)
-          const estimatedMoney = estimatedPoints * 0.0436;
+  function getIntervalMs(){
+    return parseInt(document.getElementById('interval-select').value, 10);
+  }
 
-          totalDownloads += downloads;
-          totalPoints += estimatedPoints;
-          loadedProjects++;
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
 
-          const card = document.createElement('div');
-          card.className = 'project-card';
-          card.innerHTML = `
-            <img src="${data.thumbnail || ''}" alt="${data.title || 'Projet'}">
-            <h3>${data.title || 'Sans titre'}</h3>
-            <span class="badge">${data.game || 'Minecraft'}</span>
-            
-            <div class="details">
-              <div class="details-row">
-                <span>📥 Téléchargements :</span>
-                <strong>${downloads.toLocaleString()}</strong>
-              </div>
-              <div class="details-row">
-                <span>🪙 Pièces estimées :</span>
-                <span>${estimatedPoints.toLocaleString()} pts</span>
-              </div>
-              <div class="details-row">
-                <span>💵 Gains estimés :</span>
-                <span class="highlight">${estimatedMoney.toFixed(2)} €</span>
-              </div>
-              <div class="details-row">
-                <span>❤️ Suivis / Likes :</span>
-                <strong>${(data.followers || 0).toLocaleString()}</strong>
-              </div>
-            </div>
-          `;
-          container.appendChild(card);
-        } catch (err) {
-          console.error("Erreur de chargement pour", slug, err);
-        }
-      }
+  async function fetchProject(slug, attempt = 0){
+    let res;
+    try{
+      res = await fetch(`https://api.cfwidget.com/${slug}`);
+    }catch(err){
+      return { slug, error: 'network' };
+    }
+    if(res.status === 202){
+      if(attempt >= CONFIG.maxRetries) return { slug, error: 'queue' };
+      await new Promise(r => setTimeout(r, CONFIG.retryDelayMs));
+      return fetchProject(slug, attempt + 1);
+    }
+    if(res.status === 404) return { slug, error: 'notfound' };
+    if(res.status === 400) return { slug, error: 'invalid' };
+    if(!res.ok) return { slug, error: 'unknown' };
+    try{
+      const data = await res.json();
+      return { slug, data };
+    }catch(err){
+      return { slug, error: 'unknown' };
+    }
+  }
 
-      const totalMoney = totalPoints * 0.0436;
+  function projectCardSkeleton(){
+    return `<div class="project-card skeleton">
+      <div class="card-top"><div class="thumb-skel"></div></div>
+      <div class="line-skel w70"></div>
+      <div class="line-skel w40" style="margin-top:8px;"></div>
+    </div>`;
+  }
 
-      document.getElementById('total-projects').innerText = loadedProjects;
-      document.getElementById('total-downloads').innerText = totalDownloads.toLocaleString();
-      document.getElementById('total-points').innerText = totalPoints.toLocaleString();
-      document.getElementById('total-money').innerText = totalMoney.toFixed(2).replace('.', ',') + " €";
+  function projectCardError(slug, error){
+    return `<div class="project-card error-card">
+      <div class="error-icon">⚠️</div>
+      <h3>${escapeHtml(slug)}</h3>
+      <p class="error-msg">${ERROR_MESSAGES[error] || ERROR_MESSAGES.unknown}</p>
+    </div>`;
+  }
+
+  function projectCard(data, sharePercent){
+    const downloads = (data.downloads && data.downloads.total) || 0;
+    const monthly = data.downloads && typeof data.downloads.monthly === 'number' ? data.downloads.monthly : null;
+    const points = Math.round(downloads * CONFIG.pointsPerDownload);
+    const money = points * CONFIG.eurosPerPoint;
+    return `<div class="project-card">
+      <div class="card-top">
+        <img src="${data.thumbnail || FALLBACK_ICON}" alt="" onerror="this.src='${FALLBACK_ICON}'">
+        <div>
+          <h3>${escapeHtml(data.title || 'Sans titre')}</h3>
+          <div class="badges">
+            <span class="badge">${escapeHtml(data.game || 'Minecraft')}</span>
+            ${data.type ? `<span class="badge badge-alt">${escapeHtml(data.type)}</span>` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="details">
+        <div class="details-row"><span>📥 Téléchargements</span><strong>${downloads.toLocaleString('fr-FR')}</strong></div>
+        ${monthly !== null ? `<div class="details-row"><span>📆 Ce mois-ci</span><strong>${monthly.toLocaleString('fr-FR')}</strong></div>` : ''}
+        <div class="details-row"><span>🪙 Pièces estimées</span><span>${points.toLocaleString('fr-FR')} pts</span></div>
+        <div class="details-row"><span>💶 Gains estimés</span><span class="highlight">${money.toFixed(2).replace('.', ',')} €</span></div>
+      </div>
+      <div class="share-bar" title="${sharePercent.toFixed(1)}% des téléchargements totaux">
+        <div class="share-fill" style="width:${sharePercent}%"></div>
+      </div>
+    </div>`;
+  }
+
+  function renderProjects(results){
+    const container = document.getElementById('projects-list');
+    const totalDownloads = results.reduce((s, r) => s + (r.data && r.data.downloads ? (r.data.downloads.total || 0) : 0), 0) || 1;
+
+    const html = CONFIG.slugs.map(slug => {
+      const result = results.find(r => r.slug === slug);
+      if(!result) return projectCardSkeleton();
+      if(result.error) return projectCardError(slug, result.error);
+      const share = ((result.data.downloads ? (result.data.downloads.total || 0) : 0) / totalDownloads) * 100;
+      return projectCard(result.data, share);
+    }).join('');
+
+    container.innerHTML = html;
+
+    const loaded = results.filter(r => r.data).length;
+    document.getElementById('projects-count-badge').textContent = `${loaded}/${CONFIG.slugs.length} en ligne`;
+  }
+
+  function updateStats(results){
+    const ok = results.filter(r => r.data);
+    const totalDownloads = ok.reduce((s, r) => s + (r.data.downloads ? (r.data.downloads.total || 0) : 0), 0);
+    const totalMonthly = ok.reduce((s, r) => s + (r.data.downloads && typeof r.data.downloads.monthly === 'number' ? r.data.downloads.monthly : 0), 0);
+    const totalPoints = ok.reduce((s, r) => s + Math.round((r.data.downloads ? (r.data.downloads.total || 0) : 0) * CONFIG.pointsPerDownload), 0);
+    const totalMoney = totalPoints * CONFIG.eurosPerPoint;
+
+    document.getElementById('stat-projects').textContent = `${ok.length}/${CONFIG.slugs.length}`;
+    document.getElementById('stat-downloads').textContent = totalDownloads.toLocaleString('fr-FR');
+    document.getElementById('stat-monthly').textContent = totalMonthly.toLocaleString('fr-FR');
+    document.getElementById('stat-points').textContent = totalPoints.toLocaleString('fr-FR');
+    document.getElementById('stat-money').textContent = totalMoney.toFixed(2).replace('.', ',') + ' €';
+  }
+
+  function setRefreshButtonState(loading){
+    document.getElementById('refresh-btn').classList.toggle('spinning', loading);
+  }
+
+  function updateLastUpdated(){
+    const now = new Date();
+    document.getElementById('last-updated').textContent =
+      'Mis à jour à ' + now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  async function refreshAll(){
+    if(isFetching) return;
+    isFetching = true;
+    setRefreshButtonState(true);
+
+    const results = [];
+    renderProjects(results);
+    for(const slug of CONFIG.slugs){
+      results.push(await fetchProject(slug));
+      renderProjects(results);
     }
 
-    fetchStats();
-  </script>
+    updateStats(results);
+    updateLastUpdated();
+    isFetching = false;
+    setRefreshButtonState(false);
+    resetCountdown();
+  }
+
+  function updateRing(){
+    const total = getIntervalMs();
+    const ring = document.getElementById('ring-progress');
+    const fraction = Math.max(0, Math.min(1, msRemaining / total));
+    ring.style.strokeDasharray = RING_CIRCUMFERENCE;
+    ring.style.strokeDashoffset = RING_CIRCUMFERENCE * (1 - fraction);
+  }
+
+  function resetCountdown(){
+    clearInterval(countdownTimer);
+    msRemaining = getIntervalMs();
+    updateRing();
+    countdownTimer = setInterval(() => {
+      msRemaining = Math.max(0, msRemaining - 1000);
+      updateRing();
+    }, 1000);
+  }
+
+  function scheduleAutoRefresh(){
+    clearInterval(refreshTimer);
+    refreshTimer = setInterval(refreshAll, getIntervalMs());
+    resetCountdown();
+  }
+
+  document.getElementById('refresh-btn').addEventListener('click', () => {
+    refreshAll();
+    scheduleAutoRefresh();
+  });
+  document.getElementById('interval-select').addEventListener('change', () => {
+    scheduleAutoRefresh();
+  });
+
+  refreshAll();
+  scheduleAutoRefresh();
+</script>
 </body>
 </html>
